@@ -1,0 +1,12 @@
+<Context>
+    <Resource name="jdbc/db"
+              auth="Container"
+              type="javax.sql.DataSource"
+              maxActive="100"
+              maxIdle="30"
+              maxWait="10000"
+              username="AMR"
+              password="AMR_123"
+              driverClassName="oracle.jdbc.OracleDriver"
+              url="jdbc:oracle:thin:@//localhost:1521/XEPDB1"/>
+</Context>

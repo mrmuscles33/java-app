@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../AMR_API/AMR_API.iml" filepath="$PROJECT_DIR$/../AMR_API/AMR_API.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../AMR_SCRIPT/AMR_SCRIPT.iml" filepath="$PROJECT_DIR$/../AMR_SCRIPT/AMR_SCRIPT.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AMR_WEBAPP.iml" filepath="$PROJECT_DIR$/AMR_WEBAPP.iml" />
+    </modules>
+  </component>
+</project>
