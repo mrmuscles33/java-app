@@ -1,0 +1,9 @@
+DELIMITER //
+CREATE FUNCTION TO_DATE(str VARCHAR(20), format VARCHAR(20))
+RETURNS DATE
+BEGIN
+  DECLARE result DATE;
+  SET result = STR_TO_DATE(str, format);
+  RETURN result;
+END//
+DELIMITER ;

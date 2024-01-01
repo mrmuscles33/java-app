@@ -1,25 +1,22 @@
 package fr.amr.utils;
 
+import fr.amr.database.DbMgr;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class DateUtils {
 
     public static final String D_M_Y = "dd/MM/yyyy";
     public static final String D_M_Y_H_M_S = "dd/MM/yyyy HH:mm:ss";
-    public static final String ORA_D_M_Y_H_M_S = "DD/MM/YYYY HH24:MI:SS";
-    public static final String Y_M_D = "yyyy/MM/dd";
-    public static final String Y_M_D_H_M_S = "yyyy/MM/dd HH:mm:ss";
-    public static final String ORA_Y_M_D_H_M_S = "YYYY/MM/DD HH:MI:SS";
     public static final String YMD = "yyyyMMdd";
-    public static final String YDM = "yyyyDDmm";
     public static final String YMDHMS = "yyyyMMddHHMMSS";
-    public static final String YDMHMS = "yyyyddMMHHmmss";
-    public static final String ORA_YMDHMS = "YYYYMMDDHH24MISS";
-    private static final String ORA_YDMHMS = "YYYYDDMMHH24MISS";
 
 
     private DateUtils() {
@@ -34,7 +31,7 @@ public class DateUtils {
      * @return The date as a string
      */
     public static String toString(LocalDateTime date, String format) {
-        if(date == null) {
+        if (date == null) {
             return "";
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
@@ -102,7 +99,8 @@ public class DateUtils {
      * @return The date
      */
     public static LocalDate toDate(String date, String format) {
-        return toDateTime(date, format).toLocalDate();
+        LocalDateTime dateTime = toDateTime(date, format);
+        return dateTime != null ? dateTime.toLocalDate() : null;
     }
 
     /**
@@ -112,7 +110,8 @@ public class DateUtils {
      * @return The date
      */
     public static LocalDate toDate(String date) {
-        return toDateTime(date, guessFormat(date)).toLocalDate();
+        LocalDateTime dateTime = toDateTime(date, guessFormat(date));
+        return dateTime != null ? dateTime.toLocalDate() : null;
     }
 
     /**
@@ -183,42 +182,10 @@ public class DateUtils {
      * @return The format of the date
      */
     public static String guessFormat(String date) {
-        return Stream.of(D_M_Y_H_M_S, D_M_Y, Y_M_D_H_M_S, Y_M_D, YMDHMS, YMD, YDMHMS, YDM)
+        return Stream.of(D_M_Y_H_M_S, D_M_Y, YMDHMS, YMD)
                 .filter(format -> isDate(date, format))
                 .findFirst()
                 .orElse("");
-    }
-
-    /**
-     * Get format Oracle from format Java
-     *
-     * @param formatJava The format Java
-     * @return The format Oracle
-     */
-    public static String formatOracle(String formatJava) {
-        return switch (formatJava) {
-            case D_M_Y_H_M_S -> ORA_D_M_Y_H_M_S;
-            case Y_M_D_H_M_S -> ORA_Y_M_D_H_M_S;
-            case YMDHMS -> ORA_YMDHMS;
-            case YDMHMS -> ORA_YDMHMS;
-            default -> formatJava;
-        };
-    }
-
-    /**
-     * Get format Java from format Oracle
-     *
-     * @param formatOracle The format Oracle
-     * @return The format Java
-     */
-    public static String formatJava(String formatOracle) {
-        return switch (formatOracle) {
-            case ORA_D_M_Y_H_M_S -> D_M_Y_H_M_S;
-            case ORA_Y_M_D_H_M_S -> Y_M_D_H_M_S;
-            case ORA_YMDHMS -> YMDHMS;
-            case ORA_YDMHMS -> YDMHMS;
-            default -> formatOracle;
-        };
     }
 
     /**
@@ -231,6 +198,36 @@ public class DateUtils {
      */
     public static boolean isBetween(LocalDateTime date, LocalDateTime start, LocalDateTime end) {
         return date.isAfter(start) && date.isBefore(end);
+    }
+
+    /**
+     * Transcode a date format from a system to another
+     *
+     * @param format    The format to transcode
+     * @param systemIn  The system in
+     * @param systemOut The system out
+     * @return The transcoded format
+     */
+    public static String transcodeFormat(String format, String systemIn, String systemOut) {
+        // Check parameters
+        if (StringUtils.isEmpty(format) || StringUtils.isEmpty(systemIn) || StringUtils.isEmpty(systemOut)) {
+            return format;
+        }
+
+        // All formats
+        Map<String, List<String>> matrixFormat = new HashMap<>();
+        matrixFormat.put("java", Arrays.asList(D_M_Y_H_M_S, D_M_Y, YMDHMS, YMD));
+        matrixFormat.put(DbMgr.ORACLE, Arrays.asList("DD/MM/YYYY HH24:MI:SS", "DD/MM/YYYY", "YYYYMMDDHH24:MISS", "YYYYMMDD"));
+        matrixFormat.put(DbMgr.POSTGRE, Arrays.asList("DD/MM/YYYY HH24:MI:SS", "DD/MM/YYYY", "YYYYMMDDHH24:MISS", "YYYYMMDD"));
+        matrixFormat.put(DbMgr.MYSQL, Arrays.asList("%d/%m/%Y %H:%i:%s", "%d/%m/%Y", "%Y%m%d%H:%i:%s", "%Y%m%d"));
+        matrixFormat.put(DbMgr.SQLITE, Arrays.asList("%d/%m/%Y %H:%M:%S", "%d/%m/%Y", "%Y%m%d%H:%M:%S", "%Y%m%d"));
+        matrixFormat.put(DbMgr.SQLSERVER, Arrays.asList(D_M_Y_H_M_S, D_M_Y, YMDHMS, YMD));
+
+        // Find the index of the format in the system in
+        int idx = matrixFormat.get(systemIn).indexOf(format);
+
+        // Return the format for the system out
+        return idx >= 0 ? matrixFormat.get(systemOut).get(idx) : format;
     }
 
 }

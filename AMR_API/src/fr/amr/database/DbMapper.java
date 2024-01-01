@@ -4,7 +4,6 @@ import fr.amr.utils.DateUtils;
 import fr.amr.utils.StringUtils;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,14 @@ public abstract class DbMapper {
      * @return
      */
     public String getWhere() {
-        return keys.stream().map(key -> key + " = " + (dateColumns.contains(key) ? "TO_DATE(?, '" + this.getDateFormat(key) + "')" : "?")).collect(Collectors.joining(" AND "));
+        return keys
+                .stream()
+                .map(key -> key + " = " + (
+                        dateColumns.contains(key) ?
+                                DbMgr.toDate("?", this.getDateFormat(key)) :
+                                "?"
+                ))
+                .collect(Collectors.joining(" AND "));
     }
 
     /**
@@ -60,7 +66,14 @@ public abstract class DbMapper {
      * @return The clause insert
      */
     public String getInsert() {
-        return columns.stream().map(col -> (dateColumns.contains(col) ? "TO_DATE(?,'" + this.getDateFormat(col) + "')" : "?")).collect(Collectors.joining(","));
+        return columns
+                .stream()
+                .map(col -> (
+                        dateColumns.contains(col) ?
+                                DbMgr.toDate("?", this.getDateFormat(col)) :
+                                "?"
+                ))
+                .collect(Collectors.joining(","));
     }
 
     /**
@@ -81,7 +94,14 @@ public abstract class DbMapper {
      * @return The clause update
      */
     public String getUpdate() {
-        return columns.stream().map(col -> col + " = " + (dateColumns.contains(col) ? "TO_DATE(?,'" + this.getDateFormat(col) + "')" : "?")).collect(Collectors.joining(","));
+        return columns
+                .stream()
+                .map(col -> col + " = " + (
+                        dateColumns.contains(col) ?
+                                DbMgr.toDate("?", this.getDateFormat(col)) :
+                                "?"
+                ))
+                .collect(Collectors.joining(","));
     }
 
     /**
@@ -103,7 +123,14 @@ public abstract class DbMapper {
      * @return The clause select
      */
     public String getSelect() {
-        return columns.stream().map(col -> dateColumns.contains(col) ? "TO_CHAR(" + col + ",'" + this.getDateFormat(col) + "') AS " + col : col).collect(Collectors.joining(","));
+        return columns
+                .stream()
+                .map(col ->
+                        dateColumns.contains(col) ?
+                                DbMgr.toChar(col,this.getDateFormat(col)) + " AS " + col :
+                                col
+                )
+                .collect(Collectors.joining(","));
     }
 
     /**
@@ -122,7 +149,7 @@ public abstract class DbMapper {
      * @return The date format
      */
     protected String getDateFormat(String column) {
-        return !StringUtils.isEmpty(column) ? DateUtils.ORA_D_M_Y_H_M_S : "";
+        return !StringUtils.isEmpty(column) ? DateUtils.D_M_Y_H_M_S : "";
     }
 
     /**

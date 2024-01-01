@@ -12,7 +12,7 @@ import fr.amr.utils.StringUtils;
 import fr.amr.utils.DateUtils;
 
 /**
- * Generated on 31/12/023 18:03:07
+ * Generated on 01/01/024 00:54:21
  **/
 public class TestMapper extends DbMapper {
     private LocalDateTime dt;
@@ -41,7 +41,7 @@ public class TestMapper extends DbMapper {
 
     @Override
     protected List<Object> getColumnsValues() {
-        return Arrays.asList(DateUtils.toString(this.dt, DateUtils.formatJava(this.getDateFormat("DT"))), this.id, this.label);
+        return Arrays.asList(DateUtils.toString(this.dt, this.getDateFormat("DT")), this.id, this.label);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class TestMapper extends DbMapper {
     @Override
     public void fromMap(Map<String, ?> map) {
         if (map == null) return;
-        this.setDt(DateUtils.toDateTime(StringUtils.toString(map.get("DT")), DateUtils.formatJava(this.getDateFormat("DT"))));
+        this.setDt(DateUtils.toDateTime(StringUtils.toString(map.get("DT")), this.getDateFormat("DT")));
         this.setId(NumberUtils.toDouble(map.get("ID")));
         this.setLabel(StringUtils.toString(map.get("LABEL")));
     }
@@ -84,7 +84,7 @@ public class TestMapper extends DbMapper {
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("DT", DateUtils.toString(this.getDt(), DateUtils.formatJava(this.getDateFormat("DT"))));
+        map.put("DT", DateUtils.toString(this.getDt(), this.getDateFormat("DT")));
         map.put("ID", this.getId());
         map.put("LABEL", this.getLabel());
         return map;

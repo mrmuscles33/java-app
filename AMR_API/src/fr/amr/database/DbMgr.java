@@ -1,5 +1,6 @@
 package fr.amr.database;
 
+import fr.amr.utils.DateUtils;
 import fr.amr.utils.StringUtils;
 import fr.amr.utils.StructureUtils;
 
@@ -12,6 +13,12 @@ import java.util.stream.Collectors;
 
 public class DbMgr {
 
+    public static final String MYSQL = "mysql";
+    public static final String SQLSERVER = "sqlserver";
+    public static final String ORACLE = "oracle";
+    public static final String POSTGRE = "postgre";
+    public static final String JAVA = "java";
+    public static final String SQLITE = "sqlite";
     private static Connection conn = null;
 
     private DbMgr() {
@@ -231,7 +238,10 @@ public class DbMgr {
                 sortedMap
                         .keySet()
                         .stream()
-                        .map(o -> dateFormat.containsKey(o) ? "TO_DATE(?, '" + dateFormat.get(o) + "')" : "?")
+                        .map(o -> dateFormat.containsKey(o) ?
+                                DbMgr.toDate("?", dateFormat.get(o)) :
+                                "?"
+                        )
                         .collect(Collectors.joining(","))
                 + ")";
         execute(sql, new ArrayList<>(sortedMap.values()));
@@ -281,7 +291,10 @@ public class DbMgr {
                 String.join(",",
                         columns
                                 .stream()
-                                .map(col -> dateFormat.containsKey(col) ? "TO_DATE(?, '" + dateFormat.get(col) + "')" : "?")
+                                .map(col -> dateFormat.containsKey(col) ?
+                                        DbMgr.toDate("?", dateFormat.get(col)) :
+                                        "?"
+                                )
                                 .toList())
                 + " FROM DUAL";
         String sql;
@@ -330,7 +343,10 @@ public class DbMgr {
                         sortedMap
                                 .keySet()
                                 .stream()
-                                .map(col -> dateFormat.containsKey(col) ? col + " = TO_DATE(?, '" + dateFormat.get(col) + "')" : col + " = ?")
+                                .map(col -> dateFormat.containsKey(col) ?
+                                        col + " = " + DbMgr.toDate("?",  dateFormat.get(col)) :
+                                        col + " = ?"
+                                )
                                 .toList()
                 ) + " WHERE " +
                 // key1 = ? AND key2 = TO_DATE(?,'...') AND ...
@@ -338,7 +354,10 @@ public class DbMgr {
                         keys
                                 .stream()
                                 .sorted()
-                                .map(key -> dateFormat.containsKey(key) ? key + " = TO_DATE(?, '" + dateFormat.get(key) + "')" : key + " = ?")
+                                .map(key -> dateFormat.containsKey(key) ?
+                                        key + " = " + DbMgr.toDate("?",  dateFormat.get(key)) :
+                                        key + " = ?"
+                                )
                                 .toList()
                 );
 
@@ -377,7 +396,10 @@ public class DbMgr {
                 // key1 = ? AND key2 = TO_DATE(?,'...') AND ...
                 String.join(" AND ", keys
                         .stream()
-                        .map(key -> dateFormat.containsKey(key) ? key + " = TO_DATE(?, '" + dateFormat.get(key) + "')" : key + " = ?")
+                        .map(key -> dateFormat.containsKey(key) ?
+                                key + " = " + DbMgr.toDate("?",  dateFormat.get(key)) :
+                                key + " = ?"
+                        )
                         .toList()
                 );
 
@@ -430,7 +452,10 @@ public class DbMgr {
                                     "SELECT " + keys
                                             .stream()
                                             .sorted()
-                                            .map(key -> dateFormat.containsKey(key) ? "TO_DATE(?, '" + dateFormat.get(key) + "')" : "?")
+                                            .map(key -> dateFormat.containsKey(key) ?
+                                                    DbMgr.toDate("?",  dateFormat.get(key)) :
+                                                    "?"
+                                            )
                                             .collect(Collectors.joining(","))
                                             + " FROM DUAL"
                             )
@@ -439,5 +464,87 @@ public class DbMgr {
             params = block.stream().flatMap(row -> keys.stream().sorted().map(row::get)).toList();
             execute(sql, params);
         }
+    }
+
+    /**
+     * Return the SQL command to convert a date to a string according to the database.
+     *
+     * @param col    The column
+     * @param format The format
+     * @return The SQL command
+     */
+    public static String toChar(String col, String format) {
+        return toChar(col, format, getConnection());
+    }
+
+    /**
+     * Return the SQL command to convert a date to a string according to the database.
+     *
+     * @param col    The column
+     * @param format The format
+     * @param conn   The connection
+     * @return The SQL command
+     */
+    public static String toChar(String col, String format, Connection conn) {
+        String db = getDbProductName(conn);
+        return switch (db.toLowerCase()) {
+            case MYSQL -> "DATE_FORMAT(" + col + ",'" + format + "')";
+            case SQLSERVER -> "FORMAT(" + col + ",'" + format + "')";
+            case SQLITE -> "STRFTIME('" + format + "', " + col + ")";
+            default -> "TO_CHAR(" + col + ",'" + format + "')";
+        };
+    }
+
+    public static String toDate(String col, String format) {
+        return toDate(col, format, getConnection());
+    }
+
+    public static String toDate(String col, String formatJava, Connection conn) {
+        String db = getDbProductName(conn);
+        String newFormat = DateUtils.transcodeFormat(formatJava, JAVA, db);
+        return switch (db.toLowerCase()) {
+            case MYSQL -> "STR_TO_DATE(" + col + ",'" + newFormat + "')";
+            case SQLSERVER -> "CAST(" + col + " AS DATETIME)";
+            case SQLITE -> "DATE(" + col + ")";
+            default -> "TO_DATE(" + col + ",'" + newFormat + "')";
+        };
+    }
+
+    /**
+     * Return the database product name.
+     *
+     * @return The database product name
+     * @throws SQLException
+     */
+    public static String getDbProductName() {
+        return getDbProductName(getConnection());
+    }
+
+    /**
+     * Return the database product name.
+     *
+     * @param conn The connection
+     * @return The database product name
+     * @throws SQLException
+     */
+    public static String getDbProductName(Connection conn) {
+        String db;
+        try {
+            db = StringUtils.toString(conn.getMetaData().getDatabaseProductName()).toLowerCase();
+        } catch (SQLException e) {
+            return ORACLE;
+        }
+        if (db.contains(MYSQL)) {
+            return MYSQL;
+        } else if (db.contains("sql server")) {
+            return SQLSERVER;
+        } else if (db.contains(ORACLE)) {
+            return ORACLE;
+        } else if (db.contains(POSTGRE)) {
+            return POSTGRE;
+        } else if (db.contains(SQLITE)) {
+            return SQLITE;
+        }
+        return ORACLE;
     }
 }
