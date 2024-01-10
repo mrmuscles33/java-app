@@ -4,21 +4,21 @@ import fr.amr.utils.StringUtils;
 
 import java.util.Arrays;
 
-public class Pair {
+public class Pair<A, B> {
 
-    private Object one;
-    private Object two;
+    private A one;
+    private B two;
 
-    public static Pair of(Object one, Object two) {
-        return new Pair(one, two);
+    public static Pair<?, ?> of(Object one, Object two) {
+        return new Pair<>(one, two);
     }
 
-    public Pair(Object one, Object two) {
+    public Pair(A one, B two) {
         this.one = one;
         this.two = two;
     }
 
-    public Object getOne() {
+    public A getOne() {
         return one;
     }
 
@@ -26,11 +26,11 @@ public class Pair {
         return two;
     }
 
-    public void setOne(Object one) {
+    public void setOne(A one) {
         this.one = one;
     }
 
-    public void setTwo(Object two) {
+    public void setTwo(B two) {
         this.two = two;
     }
 
@@ -41,7 +41,7 @@ public class Pair {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Pair pair) {
+        if (obj instanceof Pair<?, ?> pair) {
             return StringUtils.toString(one).equals(pair.getOne()) && StringUtils.toString(two).equals(pair.getTwo());
         }
         return false;

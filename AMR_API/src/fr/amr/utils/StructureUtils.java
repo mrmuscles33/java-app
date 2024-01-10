@@ -3,10 +3,7 @@ package fr.amr.utils;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -83,5 +80,19 @@ public class StructureUtils {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    /**
+     * Return a map from the given arguments like Map.of() without 10 arguments limit
+     *
+     * @param args The arguments
+     * @return The map
+     */
+    public static Map<?, ?> map(Object ...args) {
+        Map<Object, Object> map = new HashMap<>();
+        for (int i = 0; i < args.length - 1; i += 2) {
+            map.put(args[i], args[i + 1]);
+        }
+        return map;
     }
 }

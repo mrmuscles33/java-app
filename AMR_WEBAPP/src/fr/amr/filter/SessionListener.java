@@ -1,5 +1,6 @@
 package fr.amr.filter;
 
+import fr.amr.utils.Logger;
 import jakarta.servlet.annotation.WebListener;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
@@ -17,6 +18,7 @@ public class SessionListener implements HttpSessionListener {
     @Override
     public void sessionCreated(HttpSessionEvent event) {
         sessions.add(event.getSession());
+        Logger.trace("Session created: " + event.getSession().getId());
     }
 
     @Override

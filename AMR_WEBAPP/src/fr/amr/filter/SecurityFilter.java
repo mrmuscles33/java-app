@@ -2,7 +2,6 @@ package fr.amr.filter;
 
 import fr.amr.database.DbMgr;
 import fr.amr.structure.Pair;
-import fr.amr.utils.Logger;
 import fr.amr.utils.StringUtils;
 import fr.amr.utils.StructureUtils;
 import jakarta.servlet.*;
@@ -43,17 +42,15 @@ public class SecurityFilter implements Filter {
         JSONRequest jsonRequest = new JSONRequest(httpRequest);
         JSONResponse jsonResponse = new JSONResponse();
 
-        List<Pair> authorizedMethods = new ArrayList<>();
-
+        List<Pair<String, String>> authorizedMethods;
         // Check if session is new or not
         if (StringUtils.isEmpty(Context.get("idSession")) || httpRequest.getSession().isNew()) {
             initContext(httpRequest, jsonRequest);
         } else if (!Context.get("idSession").equals(httpRequest.getSession().getId()) || !Context.get("JSESSIONID").equals(jsonRequest.getCookie("JSESSIONID"))) {
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             return;
-        } else {
-            authorizedMethods = StructureUtils.objectToList(Context.get("authorizedMethods"));
         }
+        authorizedMethods = StructureUtils.objectToList(Context.get("authorizedMethods"));
 
         // Get class and method to call from request
         String className = httpRequest.getParameter("class");
@@ -73,11 +70,7 @@ public class SecurityFilter implements Filter {
 
                 // Send response
                 String r = jsonResponse.toString();
-                try {
-                    response.getWriter().print(r);
-                } catch (IOException e) {
-                    Logger.log(e);
-                }
+                response.getWriter().print(r);
                 response.setContentLength(r.length());
             } catch (ClassNotFoundException e) {
                 httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Class not found");

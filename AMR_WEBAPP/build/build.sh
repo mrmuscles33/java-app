@@ -6,7 +6,7 @@ source config.properties
 # Function to display help
 display_help() {
     echo "-h, --help : Display this help message"
-    echo "jars       : Build Java project AMR_API and make the jar"
+    echo "jars       : Build Java projects and make the jar"
     echo "copy       : Copy the WebContent to Tomcat webapps directory"
     echo "start      : Start Tomcat"
     echo "stop       : Stop Tomcat"
@@ -23,27 +23,43 @@ stop() {
     sleep 0.5
 }
 
-# Function to build the Java project and move the jar
-jars() {
-    echo "Building Java project AMR_API"
 
-    cd "$WORKSPACE_DIR/AMR_API" || exit
+make_jar() {
+    project_path=$1
+    lib_path=$2
+    jar_name=$3
+    main_class=$4
+
+    echo "Building Java project at $project_path"
+
+    cd "$project_path" || exit
     rm -rf bin/*
 
     find ./src -name "*.java" -print0 | xargs -0 javac -d ./bin -cp './jars/*'
 
-    echo "Main-Class: fr.amr.Main" > Manifest.txt
+    echo "Main-Class: $main_class" > Manifest.txt
     echo "Class-Path: $(find ./jars -name "*.jar" -printf "%p ") " >> Manifest.txt
-    echo "Making jar amr-api.jar"
-    jar cvfm amr-api.jar Manifest.txt -C bin/ . > /dev/null 2>&1
+    echo "Making jar $jar_name"
+    jar cvfm "$jar_name" Manifest.txt -C bin/ . > /dev/null 2>&1
 
     sleep 0.5
 
-    echo "Moving jar amr-api.jar to $WORKSPACE_DIR/AMR_WEBAPP/WebContent/WEB-INF/lib"
-    mv amr-api.jar "$WORKSPACE_DIR/AMR_WEBAPP/WebContent/WEB-INF/lib/amr-api.jar"
+    echo "Moving jar $jar_name to $lib_path"
+    mv "$jar_name" "$lib_path/$jar_name"
     rm Manifest.txt
 
     sleep 0.5
+}
+
+# Function to build the Java project and move the jar
+jar_api() {
+    make_jar "$WORKSPACE_DIR/AMR_API" "$WORKSPACE_DIR/AMR_WEBAPP/WebContent/WEB-INF/lib" "amr-api.jar" "fr.amr.Main"
+}
+
+# Function to build all the jars
+jars() {
+    echo "Building jars"
+    jar_api
 }
 
 # Function to copy the content of the directory

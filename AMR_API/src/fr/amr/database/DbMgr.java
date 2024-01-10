@@ -344,7 +344,7 @@ public class DbMgr {
                                 .keySet()
                                 .stream()
                                 .map(col -> dateFormat.containsKey(col) ?
-                                        col + " = " + DbMgr.toDate("?",  dateFormat.get(col)) :
+                                        col + " = " + DbMgr.toDate("?", dateFormat.get(col)) :
                                         col + " = ?"
                                 )
                                 .toList()
@@ -355,7 +355,7 @@ public class DbMgr {
                                 .stream()
                                 .sorted()
                                 .map(key -> dateFormat.containsKey(key) ?
-                                        key + " = " + DbMgr.toDate("?",  dateFormat.get(key)) :
+                                        key + " = " + DbMgr.toDate("?", dateFormat.get(key)) :
                                         key + " = ?"
                                 )
                                 .toList()
@@ -397,7 +397,7 @@ public class DbMgr {
                 String.join(" AND ", keys
                         .stream()
                         .map(key -> dateFormat.containsKey(key) ?
-                                key + " = " + DbMgr.toDate("?",  dateFormat.get(key)) :
+                                key + " = " + DbMgr.toDate("?", dateFormat.get(key)) :
                                 key + " = ?"
                         )
                         .toList()
@@ -453,7 +453,7 @@ public class DbMgr {
                                             .stream()
                                             .sorted()
                                             .map(key -> dateFormat.containsKey(key) ?
-                                                    DbMgr.toDate("?",  dateFormat.get(key)) :
+                                                    DbMgr.toDate("?", dateFormat.get(key)) :
                                                     "?"
                                             )
                                             .collect(Collectors.joining(","))
@@ -495,10 +495,25 @@ public class DbMgr {
         };
     }
 
+    /**
+     * Return the SQL command to convert a string to a date according to the database.
+     *
+     * @param col    The column
+     * @param format The format
+     * @return The SQL command
+     */
     public static String toDate(String col, String format) {
         return toDate(col, format, getConnection());
     }
 
+    /**
+     * Return the SQL command to convert a string to a date according to the database.
+     *
+     * @param col        The column
+     * @param formatJava The format
+     * @param conn       The connection
+     * @return The SQL command
+     */
     public static String toDate(String col, String formatJava, Connection conn) {
         String db = getDbProductName(conn);
         String newFormat = DateUtils.transcodeFormat(formatJava, JAVA, db);

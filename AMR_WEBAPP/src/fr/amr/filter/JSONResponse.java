@@ -114,26 +114,26 @@ public class JSONResponse {
     private void setData(JsonObjectBuilder pJson, String name, Object value) {
         if (value == null) {
             pJson.addNull(name);
-        } else if (value instanceof BigDecimal) {
-            pJson.add(name, (BigDecimal) value);
-        } else if (value instanceof BigInteger) {
-            pJson.add(name, (BigInteger) value);
-        } else if (value instanceof Boolean) {
-            pJson.add(name, (boolean) value);
-        } else if (value instanceof Integer) {
-            pJson.add(name, (int) value);
-        } else if (value instanceof Long) {
-            pJson.add(name, (long) value);
-        } else if (value instanceof String) {
-            pJson.add(name, (String) value);
-        } else if (value instanceof Character) {
-            pJson.add(name, (char) value);
-        } else if (value instanceof char[]) {
-            pJson.add(name, String.valueOf((char[]) value));
-        } else if (value instanceof LocalDate) {
-            pJson.add(name, DateUtils.toString((LocalDate) value, DateUtils.D_M_Y));
-        } else if (value instanceof LocalDateTime) {
-            pJson.add(name, DateUtils.toString((LocalDateTime) value, DateUtils.D_M_Y_H_M_S));
+        } else if (value instanceof BigDecimal bd) {
+            pJson.add(name, bd);
+        } else if (value instanceof BigInteger bi) {
+            pJson.add(name, bi);
+        } else if (value instanceof Boolean b) {
+            pJson.add(name, b);
+        } else if (value instanceof Integer i) {
+            pJson.add(name, i);
+        } else if (value instanceof Long l) {
+            pJson.add(name, l);
+        } else if (value instanceof String s) {
+            pJson.add(name, s);
+        } else if (value instanceof Character c) {
+            pJson.add(name, c);
+        } else if (value instanceof char[] ca) {
+            pJson.add(name, String.valueOf(ca));
+        } else if (value instanceof LocalDate ld) {
+            pJson.add(name, DateUtils.toString(ld, DateUtils.D_M_Y));
+        } else if (value instanceof LocalDateTime ldt) {
+            pJson.add(name, DateUtils.toString(ldt, DateUtils.D_M_Y_H_M_S));
         } else if (value instanceof Iterable<?> it) {
             JsonArrayBuilder jsonArray = Json.createArrayBuilder();
             it.forEach(v -> setData(jsonArray, v));
@@ -160,26 +160,26 @@ public class JSONResponse {
     private void setData(JsonArrayBuilder pJson, Object value) {
         if (value == null) {
             pJson.addNull();
-        } else if (value instanceof BigDecimal) {
-            pJson.add((BigDecimal) value);
-        } else if (value instanceof BigInteger) {
-            pJson.add((BigInteger) value);
-        } else if (value instanceof Boolean) {
-            pJson.add((boolean) value);
-        } else if (value instanceof Integer) {
-            pJson.add((int) value);
-        } else if (value instanceof Long) {
-            pJson.add((long) value);
-        } else if (value instanceof String) {
-            pJson.add((String) value);
-        } else if (value instanceof Character) {
-            pJson.add((char) value);
-        } else if (value instanceof char[]) {
-            pJson.add(String.valueOf((char[]) value));
-        } else if (value instanceof LocalDate) {
-            pJson.add(DateUtils.toString((LocalDate) value, DateUtils.D_M_Y));
-        } else if (value instanceof LocalDateTime) {
-            pJson.add(DateUtils.toString((LocalDateTime) value, DateUtils.D_M_Y_H_M_S));
+        } else if (value instanceof BigDecimal bd) {
+            pJson.add(bd);
+        } else if (value instanceof BigInteger bi) {
+            pJson.add(bi);
+        } else if (value instanceof Boolean b) {
+            pJson.add(b);
+        } else if (value instanceof Integer i) {
+            pJson.add(i);
+        } else if (value instanceof Long l) {
+            pJson.add(l);
+        } else if (value instanceof String s) {
+            pJson.add(s);
+        } else if (value instanceof Character c) {
+            pJson.add(c);
+        } else if (value instanceof char[] ca) {
+            pJson.add(String.valueOf(ca));
+        } else if (value instanceof LocalDate ld) {
+            pJson.add(DateUtils.toString(ld, DateUtils.D_M_Y));
+        } else if (value instanceof LocalDateTime ldt) {
+            pJson.add(DateUtils.toString(ldt, DateUtils.D_M_Y_H_M_S));
         } else if (value instanceof Iterable<?> it) {
             JsonArrayBuilder jsonArray = Json.createArrayBuilder();
             it.forEach(v -> setData(jsonArray, v));

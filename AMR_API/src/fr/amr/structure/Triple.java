@@ -4,24 +4,24 @@ import fr.amr.utils.StringUtils;
 
 import java.util.Arrays;
 
-public class Triple extends Pair {
+public class Triple<A,B,C> extends Pair<A,B> {
 
-    private Object three;
+    private C three;
 
-    public static Triple of(Object one, Object two, Object three) {
-        return new Triple(one, two, three);
+    public static Triple<?,?,?> of(Object one, Object two, Object three) {
+        return new Triple<>(one, two, three);
     }
 
-    public Triple(Object one, Object two, Object three) {
+    public Triple(A one, B two, C three) {
         super(one, two);
         this.three = three;
     }
 
-    public Object getThree() {
+    public C getThree() {
         return three;
     }
 
-    public void setThree(Object three) {
+    public void setThree(C three) {
         this.three = three;
     }
 
@@ -32,7 +32,7 @@ public class Triple extends Pair {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Triple triple) {
+        if (obj instanceof Triple<?, ?, ?> triple) {
             return super.equals(triple) && StringUtils.toString(three).equals(triple.getThree());
         }
         return false;
