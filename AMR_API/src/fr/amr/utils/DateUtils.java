@@ -16,7 +16,7 @@ public class DateUtils {
     public static final String D_M_Y = "dd/MM/yyyy";
     public static final String D_M_Y_H_M_S = "dd/MM/yyyy HH:mm:ss";
     public static final String YMD = "yyyyMMdd";
-    public static final String YMDHMS = "yyyyMMddHHMMSS";
+    public static final String YMDHMS = "yyyyMMddHHmmSS";
 
 
     private DateUtils() {
@@ -56,7 +56,7 @@ public class DateUtils {
      * @return The date as a string
      */
     public static String toString(LocalDateTime date) {
-        return toString(date, D_M_Y_H_M_S);
+        return toString(date, YMDHMS);
     }
 
     /**
@@ -66,7 +66,7 @@ public class DateUtils {
      * @return The date as a string
      */
     public static String toString(LocalDate date) {
-        return toString(date.atStartOfDay(), D_M_Y);
+        return toString(date.atStartOfDay(), YMD);
     }
 
     /**

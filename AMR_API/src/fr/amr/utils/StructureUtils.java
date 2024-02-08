@@ -88,10 +88,10 @@ public class StructureUtils {
      * @param args The arguments
      * @return The map
      */
-    public static Map<?, ?> map(Object ...args) {
-        Map<Object, Object> map = new HashMap<>();
+    public static Map<String, Object> map(Object ...args) {
+        Map<String, Object> map = new HashMap<>();
         for (int i = 0; i < args.length - 1; i += 2) {
-            map.put(args[i], args[i + 1]);
+            map.put(StringUtils.toString(args[i]), args[i + 1]);
         }
         return map;
     }

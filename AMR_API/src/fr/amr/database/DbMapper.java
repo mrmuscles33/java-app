@@ -149,7 +149,7 @@ public abstract class DbMapper {
      * @return The date format
      */
     protected String getDateFormat(String column) {
-        return !StringUtils.isEmpty(column) ? DateUtils.D_M_Y_H_M_S : "";
+        return !StringUtils.isEmpty(column) ? DateUtils.YMDHMS : "";
     }
 
     /**

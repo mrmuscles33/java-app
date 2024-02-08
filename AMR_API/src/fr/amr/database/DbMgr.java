@@ -175,6 +175,18 @@ public class DbMgr {
     }
 
     /**
+     * Return true if the row exists in the database.
+     *
+     * @param sql    The SQL query
+     * @param params The parameters to replace the ? in the query
+     * @return True if the row exists, false otherwise
+     * @throws SQLException
+     */
+    public static boolean exists(String sql, List<Object> params) throws SQLException {
+        return !getRows(sql, params).isEmpty();
+    }
+
+    /**
      * Execute the SQL query (INSERT, UPDATE, DELETE).
      *
      * @param sql    The SQL query
@@ -522,6 +534,31 @@ public class DbMgr {
             case SQLSERVER -> "CAST(" + col + " AS DATETIME)";
             case SQLITE -> "DATE(" + col + ")";
             default -> "TO_DATE(" + col + ",'" + newFormat + "')";
+        };
+    }
+
+    /**
+     * Return the SQL command to convert a string to a date according to the database.
+     *
+     * @return The SQL command
+     */
+    public static String sysdate() {
+        return sysdate(getConnection());
+    }
+
+    /**
+     * Return the SQL command to get the current date according to the database.
+     *
+     * @param conn The connection
+     * @return The SQL command
+     */
+    public static String sysdate(Connection conn) {
+        String db = getDbProductName(conn);
+        return switch (db.toLowerCase()) {
+            case MYSQL -> "NOW()";
+            case SQLSERVER -> "GETDATE()";
+            case SQLITE -> "DATETIME('now')";
+            default -> "SYSDATE";
         };
     }
 

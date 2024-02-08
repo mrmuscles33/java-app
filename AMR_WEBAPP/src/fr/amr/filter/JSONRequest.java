@@ -10,22 +10,9 @@ import java.util.stream.Collectors;
 public class JSONRequest {
 
     private final HttpServletRequest request;
-    private final Map<String, String> parameters;
-    private final Map<String, String> cookies;
-    private final Map<String, String> headers;
 
     public JSONRequest(HttpServletRequest httpRequest) {
         request = httpRequest;
-        parameters = Collections
-                .list(request.getParameterNames())
-                .stream()
-                .collect(Collectors.toMap(Function.identity(), request::getParameter));
-        cookies = Arrays
-                .stream(request.getCookies())
-                .collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
-        headers = Collections.list(request.getHeaderNames())
-                .stream()
-                .collect(Collectors.toMap(Function.identity(), request::getHeader));
     }
 
     /**
@@ -35,7 +22,7 @@ public class JSONRequest {
      * @return The parameter
      */
     public String getParam(String name) {
-        return parameters.get(name);
+        return getParams().get(name);
     }
 
     /**
@@ -44,7 +31,10 @@ public class JSONRequest {
      * @return The parameters
      */
     public Map<String, String> getParams() {
-        return parameters;
+        return Collections
+                .list(request.getParameterNames())
+                .stream()
+                .collect(Collectors.toMap(Function.identity(), request::getParameter));
     }
 
     /**
@@ -54,7 +44,7 @@ public class JSONRequest {
      * @return The cookie
      */
     public String getCookie(String name) {
-        return cookies.get(name);
+        return getCookies().get(name);
     }
 
     /**
@@ -63,7 +53,9 @@ public class JSONRequest {
      * @return The cookies
      */
     public Map<String, String> getCookies() {
-        return cookies;
+        return Arrays
+                .stream(request.getCookies())
+                .collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
     }
 
     /**
@@ -73,7 +65,7 @@ public class JSONRequest {
      * @return The header
      */
     public String getHeader(String name) {
-        return headers.get(name);
+        return getHeaders().get(name);
     }
 
     /**
@@ -82,11 +74,15 @@ public class JSONRequest {
      * @return The headers
      */
     public Map<String, String> getHeaders() {
-        return headers;
+        return
+                Collections.list(request.getHeaderNames())
+                        .stream()
+                        .collect(Collectors.toMap(Function.identity(), request::getHeader));
     }
 
     /**
      * Get the request
+     *
      * @return The request
      */
     public HttpServletRequest getRequest() {
